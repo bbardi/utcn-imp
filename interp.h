@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <vector>
-
+#include <stdexcept>
 #include "runtime.h"
 
 class Program;
