@@ -81,6 +81,12 @@ public:
     return *value_.StringValue;
   }
 
+  uint64_t GetInteger() const
+  {
+    assert(Is(Kind::INT) && "not an integer");
+    return value_.IntValue;
+  }
+
   /// Return the string value.
   std::string_view GetString() const
   {
@@ -107,6 +113,7 @@ public:
   static Token While(const Location &l) { return Token(l, Kind::WHILE); }
   static Token Ident(const Location &l, const std::string &str);
   static Token String(const Location &l, const std::string &str);
+  static Token Integer(const Location &l, const uint64_t &integ);
   static Token Minus(const Location &l) {return Token(l, Kind::MINUS);}
 
   /// Print the token to a stream.

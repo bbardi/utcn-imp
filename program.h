@@ -15,7 +15,8 @@
 enum class Opcode : uint8_t {
   PUSH_FUNC,
   PUSH_PROTO,
-
+  PUSH_INT,
+  
   PEEK,
   POP,
   CALL,

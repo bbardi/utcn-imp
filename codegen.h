@@ -151,6 +151,8 @@ private:
   void EmitAdd();
   /// Emit an sub opcode.
   void EmitSub();
+  /// Emit an push opcode
+  void EmitPush(uint64_t number);
   /// Emit a label.
   void EmitLabel(Label label);
   /// Emit a conditional jump.

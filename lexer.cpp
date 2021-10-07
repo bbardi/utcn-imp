@@ -17,6 +17,10 @@ Token::Token(const Token &that)
       value_.StringValue = new std::string(*that.value_.StringValue);
       break;
     }
+    case Kind::INT: {
+      value_.IntValue = that.value_.IntValue;
+      break;
+    }
     default: {
       break;
     }
@@ -42,6 +46,10 @@ Token &Token::operator=(const Token &that)
     case Kind::STRING:
     case Kind::IDENT: {
       value_.StringValue = new std::string(*that.value_.StringValue);
+      break;
+    }
+    case Kind::INT: {
+      value_.IntValue = that.value_.IntValue;
       break;
     }
     default: {
@@ -79,6 +87,14 @@ Token Token::String(const Location &l, const std::string &str)
 {
   Token tk(l, Kind::STRING);
   tk.value_.StringValue = new std::string(str);
+  return tk;
+}
+
+// -----------------------------------------------------------------------------
+Token Token::Integer(const Location &l, const uint64_t &integ)
+{
+  Token tk(l, Kind::INT);
+  tk.value_.IntValue = integ;
   return tk;
 }
 
@@ -159,6 +175,10 @@ static bool IsIdentStart(char chr)
   return chr == '_' || isalpha(chr);
 }
 
+static bool IsDigit(char chr)
+{
+  return isdigit(chr);
+}
 // -----------------------------------------------------------------------------
 static bool IsIdentLetter(char chr)
 {
@@ -210,6 +230,15 @@ const Token &Lexer::Next()
         if (word == "while") return tk_ = Token::While(loc);
         return tk_ = Token::Ident(loc, word);
       }
+      else{
+      if (IsDigit(chr_)){
+        std::string number;
+        do {
+          number.push_back(chr_);
+          NextChar();
+        } while(IsDigit(chr_));
+        return tk_ = Token::Integer(loc, stoi(number));
+      }}
       Error("unknown character '" + std::string(1, chr_) + "'");
     }
   }
