@@ -2,7 +2,7 @@
 
 #include "interp.h"
 #include "program.h"
-
+#include <limits>
 #include <iostream>
 
 
@@ -57,12 +57,20 @@ void Interp::Run()
       case Opcode::ADD: {
         auto rhs = PopInt();
         auto lhs = PopInt();
+        if (rhs > 0 && lhs > INT64_MAX - rhs)
+          throw RuntimeError("Integer overflow");
+        if (rhs < 0 && lhs < INT64_MIN - rhs)
+          throw RuntimeError("Integer underflow");
         Push(lhs + rhs);
         continue;
       }
       case Opcode::SUB: {
         auto rhs = PopInt();
         auto lhs = PopInt();
+        if (lhs < 0 && rhs > INT64_MAX + lhs)
+          throw RuntimeError("Integer overflow");
+        if (lhs > 0 && rhs < INT64_MIN + lhs)
+          throw RuntimeError("Integer underflow");
         Push(rhs - lhs);
         continue;
       }
