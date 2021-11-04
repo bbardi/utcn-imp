@@ -177,6 +177,9 @@ void Codegen::LowerExpr(const Scope &scope, const Expr &expr)
     case Expr::Kind::CALL: {
       return LowerCallExpr(scope, static_cast<const CallExpr &>(expr));
     }
+    case Expr::Kind::INTEGER: {
+      EmitPush(static_cast<const IntegerExpr &>(expr).GetNumber());
+    }
   }
 }
 
@@ -208,6 +211,9 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
   switch (binary.GetKind()) {
     case BinaryExpr::Kind::ADD: {
       return EmitAdd();
+    }
+    case BinaryExpr::Kind::MINUS:{
+      return EmitSub();
     }
   }
 }
@@ -321,6 +327,13 @@ void Codegen::EmitPeek(uint32_t index)
   Emit<Opcode>(Opcode::PEEK);
   Emit<uint32_t>(index);
 }
+// -----------------------------------------------------------------------------
+void Codegen::EmitPush(uint64_t value)
+{
+  depth_ += 1;
+  Emit<Opcode>(Opcode::PUSH_INT);
+  Emit<int64_t>(value);
+}
 
 // -----------------------------------------------------------------------------
 void Codegen::EmitReturn()
@@ -338,6 +351,14 @@ void Codegen::EmitAdd()
   assert(depth_ > 0 && "no elements on stack");
   depth_ -= 1;
   Emit<Opcode>(Opcode::ADD);
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::EmitSub()
+{
+  assert(depth_ > 0 && "no elements on stack");
+  depth_ -= 1;
+  Emit<Opcode>(Opcode::SUB);
 }
 
 // -----------------------------------------------------------------------------

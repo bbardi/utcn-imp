@@ -44,6 +44,7 @@ public:
   enum class Kind {
     REF,
     BINARY,
+    INTEGER,
     CALL,
   };
 
@@ -75,6 +76,18 @@ private:
   std::string name_;
 };
 
+class IntegerExpr : public Expr {
+public:
+  IntegerExpr(const uint64_t &integer)
+    : Expr(Kind::INTEGER)
+    , number(integer)
+  {
+  }
+  const uint64_t &GetNumber() const { return number;}
+private:
+  uint64_t number;
+};
+
 /**
  * Binary expression.
  */
@@ -82,7 +95,8 @@ class BinaryExpr : public Expr {
 public:
   /// Enumeration of binary operators.
   enum class Kind {
-    ADD
+    ADD,
+    MINUS
   };
 
 public:

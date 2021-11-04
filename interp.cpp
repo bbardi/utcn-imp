@@ -2,7 +2,7 @@
 
 #include "interp.h"
 #include "program.h"
-
+#include <limits>
 #include <iostream>
 
 
@@ -19,6 +19,12 @@ void Interp::Run()
       }
       case Opcode::PUSH_PROTO: {
         Push(prog_.Read<RuntimeFn>(pc_));
+        continue;
+      }
+      case Opcode::PUSH_INT: {
+        Interp::Value val(prog_.Read<int64_t>(pc_));
+        val.Kind = Value::Kind::INT;
+        Push(val);
         continue;
       }
       case Opcode::PEEK: {
@@ -51,7 +57,21 @@ void Interp::Run()
       case Opcode::ADD: {
         auto rhs = PopInt();
         auto lhs = PopInt();
+        if (rhs > 0 && lhs > INT64_MAX - rhs)
+          throw RuntimeError("Integer overflow");
+        if (rhs < 0 && lhs < INT64_MIN - rhs)
+          throw RuntimeError("Integer underflow");
         Push(lhs + rhs);
+        continue;
+      }
+      case Opcode::SUB: {
+        auto rhs = PopInt();
+        auto lhs = PopInt();
+        if (lhs < 0 && rhs > INT64_MAX + lhs)
+          throw RuntimeError("Integer overflow");
+        if (lhs > 0 && rhs < INT64_MIN + lhs)
+          throw RuntimeError("Integer underflow");
+        Push(rhs - lhs);
         continue;
       }
       case Opcode::RET: {
