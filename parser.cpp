@@ -5,7 +5,7 @@
 #include "parser.h"
 #include "lexer.h"
 #include "ast.h"
-
+#include "interp.h"
 
 
 // -----------------------------------------------------------------------------
@@ -88,6 +88,7 @@ std::shared_ptr<Stmt> Parser::ParseStmt()
   switch (tk.GetKind()) {
     case Token::Kind::RETURN: return ParseReturnStmt();
     case Token::Kind::WHILE: return ParseWhileStmt();
+    case Token::Kind::IF: return ParseIfStmt();
     case Token::Kind::LBRACE: return ParseBlockStmt();
     default: return std::make_shared<ExprStmt>(ParseExpr());
   }
@@ -130,6 +131,24 @@ std::shared_ptr<WhileStmt> Parser::ParseWhileStmt()
   lexer_.Next();
   auto stmt = ParseStmt();
   return std::make_shared<WhileStmt>(cond, stmt);
+}
+
+// -----------------------------------------------------------------------------
+std::shared_ptr<IfStmt> Parser::ParseIfStmt()
+{
+    Check(Token::Kind::IF);
+    Expect(Token::Kind::LPAREN);
+    lexer_.Next();
+    auto cond = ParseExpr();
+    Check(Token::Kind::RPAREN);
+    lexer_.Next();
+    auto stmt = ParseStmt();
+    if(Current().Is(Token::Kind::ELSE)){
+        lexer_.Next();
+        auto elsestmt = ParseStmt();
+        return std::make_shared<IfStmt>(cond, stmt, elsestmt);
+    }
+    return std::make_shared<IfStmt>(cond, stmt);
 }
 
 // -----------------------------------------------------------------------------
@@ -189,14 +208,25 @@ std::shared_ptr<Expr> Parser::ParseCallExpr()
 std::shared_ptr<Expr> Parser::ParseMulDivExpr()
 {
   std::shared_ptr<Expr> term = ParseCallExpr();
-  while (Current().Is(Token::Kind::STAR) || Current().Is(Token::Kind::DIV)) {
-    bool div = Current().Is(Token::Kind::DIV);
+  while (Current().Is(Token::Kind::STAR) ||
+        Current().Is(Token::Kind::DIV) ||
+        Current().Is(Token::Kind::MOD)) {
+    Token tok = Current();
     lexer_.Next();
     auto rhs = ParseCallExpr();
-    if(div)
-      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::DIV, term, rhs);
-    else
-      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MUL, term, rhs);
+    switch (tok.GetKind()){
+        case Token::Kind::DIV:
+            term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::DIV, term, rhs);
+            break;
+        case Token::Kind::STAR:
+            term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MUL, term, rhs);
+            break;
+        case Token::Kind::MOD:
+            term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MOD, term, rhs);
+            break;
+        default:
+            throw RuntimeError("Should not get here");
+    }
   }
   return term;
 }

@@ -144,7 +144,10 @@ std::ostream &operator<<(std::ostream &os, const Token::Kind kind)
     case Token::Kind::MINUS: return os << "-";
     case Token::Kind::STAR: return os << "*";
     case Token::Kind::DIV: return os << "/";
+    case Token::Kind::MOD: return os << "%";
     case Token::Kind::DEQUAL: return os <<"==";
+    case Token::Kind::IF: return os <<"if";
+    case Token::Kind::ELSE: return os <<"else";
   }
   return os;
 }
@@ -218,6 +221,7 @@ const Token &Lexer::Next()
     case '-': return NextChar(), tk_ = Token::Minus(loc);
     case '*': return NextChar(), tk_ = Token::Star(loc);
     case '/': return NextChar(), tk_ = Token::Div(loc);
+    case '%': return NextChar(), tk_ = Token::Mod(loc);
     case '"': {
       std::string word;
       NextChar();
@@ -241,6 +245,8 @@ const Token &Lexer::Next()
         if (word == "func") return tk_ = Token::Func(loc);
         if (word == "return") return tk_ = Token::Return(loc);
         if (word == "while") return tk_ = Token::While(loc);
+        if (word == "if") return tk_ = Token::If(loc);
+        if (word == "else") return tk_ = Token::Else(loc);
         return tk_ = Token::Ident(loc, word);
       }
       else{

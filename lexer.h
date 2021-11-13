@@ -37,6 +37,8 @@ public:
     FUNC,
     RETURN,
     WHILE,
+    IF,
+    ELSE,
     // Symbols.
     LPAREN,
     RPAREN,
@@ -50,6 +52,7 @@ public:
     MINUS,
     STAR,
     DIV,
+    MOD,
     DEQUAL,
     // Complex tokens.
     INT,
@@ -120,7 +123,10 @@ public:
   static Token Minus(const Location &l) {return Token(l, Kind::MINUS);}
   static Token Star(const Location &l) {return Token(l, Kind::STAR);}
   static Token Div(const Location &l) {return Token(l, Kind::DIV);}
+  static Token Mod(const Location &l) {return Token(l, Kind::MOD);}
   static Token DoubleEqual(const Location &l) {return Token(l, Kind::DEQUAL);}
+  static Token If(const Location &l) { return Token(l, Kind::IF);}
+  static Token Else(const Location &l) { return Token(l, Kind::ELSE);}
   /// Print the token to a stream.
   void Print(std::ostream &os) const;
 

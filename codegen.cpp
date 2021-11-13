@@ -114,6 +114,9 @@ void Codegen::LowerStmt(const Scope &scope, const Stmt &stmt)
     case Stmt::Kind::WHILE: {
       return LowerWhileStmt(scope, static_cast<const WhileStmt &>(stmt));
     }
+    case Stmt::Kind::IF: {
+        return LowerIfStmt(scope, static_cast<const IfStmt &>(stmt));
+    }
     case Stmt::Kind::EXPR: {
       return LowerExprStmt(scope, static_cast<const ExprStmt &>(stmt));
     }
@@ -134,6 +137,19 @@ void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
   }
 
   assert(depth_ == depthIn && "mismatched block depth on exit");
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::LowerIfStmt(const Scope &scope, const IfStmt &ifStmt)
+{
+    auto exit = MakeLabel();
+
+    LowerExpr(scope, ifStmt.GetCond());
+    EmitJumpFalse(exit);
+    LowerStmt(scope, ifStmt.GetStmt());
+    EmitLabel(exit);
+    if(ifStmt.HaveElse())
+    LowerStmt(scope, ifStmt.GetElseStmt());
 }
 
 // -----------------------------------------------------------------------------
@@ -223,6 +239,9 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
     }
     case BinaryExpr::Kind::EQUAL: {
         return EmitEqual();
+    }
+    case BinaryExpr::Kind::MOD: {
+        return EmitMod();
     }
   }
 }
@@ -384,6 +403,14 @@ void Codegen::EmitDiv()
     assert(depth_ > 0 && "no elements on stack");
     depth_ -= 1;
     Emit<Opcode>(Opcode::DIV);
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::EmitMod()
+{
+    assert(depth_ > 0 && "no elements on stack");
+    depth_ -= 1;
+    Emit<Opcode>(Opcode::MOD);
 }
 
 // -----------------------------------------------------------------------------

@@ -21,6 +21,7 @@ public:
   enum class Kind {
     BLOCK,
     WHILE,
+    IF,
     EXPR,
     RETURN
   };
@@ -99,6 +100,7 @@ public:
     MINUS,
     MUL,
     DIV,
+    MOD,
     EQUAL
   };
 
@@ -231,6 +233,38 @@ private:
   std::shared_ptr<Expr> cond_;
   /// Expression to be executed in the loop body.
   std::shared_ptr<Stmt> stmt_;
+};
+
+class IfStmt final : public Stmt {
+public:
+    IfStmt(std::shared_ptr<Expr> cond, std::shared_ptr<Stmt> stmt)
+    : Stmt(Kind::IF)
+    , haveElse(false)
+    , cond_(cond)
+    , stmt_(stmt){}
+    IfStmt(std::shared_ptr<Expr> cond, std::shared_ptr<Stmt> stmt, std::shared_ptr<Stmt> elsestmt)
+            : Stmt(Kind::IF)
+            , haveElse(true)
+            , cond_(cond)
+            , stmt_(stmt)
+            , elsestmt_(elsestmt){}
+
+    bool HaveElse() const {
+        return haveElse;
+    }
+
+    const Expr &GetCond() const { return *cond_; }
+    const Stmt &GetStmt() const { return *stmt_; }
+    const Stmt &GetElseStmt() const { return *elsestmt_; }
+
+private:
+    bool haveElse;
+    /// Condition for the if statement.
+    std::shared_ptr<Expr> cond_;
+    /// Expression to be executed in the true body.
+    std::shared_ptr<Stmt> stmt_;
+    /// Expression to be executed in the else body.
+    std::shared_ptr<Stmt> elsestmt_;
 };
 
 /**
