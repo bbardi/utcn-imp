@@ -151,6 +151,12 @@ std::shared_ptr<Expr> Parser::ParseTermExpr()
         std::make_shared<IntegerExpr>(integer)
       );
     }
+    case Token::Kind::LPAREN: {
+        lexer_.Next();
+        auto expr = ParseExpr();
+        lexer_.Next();
+        return expr;
+    }
     default: {
       std::ostringstream os;
       os << "unexpected " << tk << ", expecting term";
@@ -178,14 +184,31 @@ std::shared_ptr<Expr> Parser::ParseCallExpr()
   return callee;
 }
 
+
+// -----------------------------------------------------------------------------
+std::shared_ptr<Expr> Parser::ParseMulDivExpr()
+{
+  std::shared_ptr<Expr> term = ParseCallExpr();
+  while (Current().Is(Token::Kind::STAR) || Current().Is(Token::Kind::DIV)) {
+    bool div = Current().Is(Token::Kind::DIV);
+    lexer_.Next();
+    auto rhs = ParseCallExpr();
+    if(div)
+      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::DIV, term, rhs);
+    else
+      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MUL, term, rhs);
+  }
+  return term;
+}
+
 // -----------------------------------------------------------------------------
 std::shared_ptr<Expr> Parser::ParseAddSubExpr()
 {
-  std::shared_ptr<Expr> term = ParseCallExpr();
+  std::shared_ptr<Expr> term = ParseMulDivExpr();
   while (Current().Is(Token::Kind::PLUS) || Current().Is(Token::Kind::MINUS)) {
     bool plus = Current().Is(Token::Kind::PLUS);
     lexer_.Next();
-    auto rhs = ParseCallExpr();
+    auto rhs = ParseMulDivExpr();
     if(plus)
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::ADD, term, rhs);
     else

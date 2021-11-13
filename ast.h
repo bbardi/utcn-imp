@@ -96,7 +96,9 @@ public:
   /// Enumeration of binary operators.
   enum class Kind {
     ADD,
-    MINUS
+    MINUS,
+    MUL,
+    DIV
   };
 
 public:

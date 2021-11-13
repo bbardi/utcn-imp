@@ -46,6 +46,8 @@ private:
   std::shared_ptr<Expr> ParseTermExpr();
   /// Parse a call expression.
   std::shared_ptr<Expr> ParseCallExpr();
+  /// Parse an mul/div expression.
+  std::shared_ptr<Expr> ParseMulDivExpr();
   /// Parse an add/sub expression.
   std::shared_ptr<Expr> ParseAddSubExpr();
 

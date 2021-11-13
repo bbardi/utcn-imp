@@ -151,6 +151,10 @@ private:
   void EmitAdd();
   /// Emit an sub opcode.
   void EmitSub();
+  /// Emit an mul opcode.
+  void EmitMul();
+  /// Emit an mul opcode.
+  void EmitDiv();
   /// Emit an push opcode
   void EmitPush(uint64_t number);
   /// Emit a label.

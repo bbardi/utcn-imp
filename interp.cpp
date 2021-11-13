@@ -74,6 +74,21 @@ void Interp::Run()
         Push(rhs - lhs);
         continue;
       }
+      case Opcode::MUL: {
+        auto rhs = PopInt();
+        auto lhs = PopInt();
+        uint64_t x = rhs*lhs;
+        if(lhs != 0 && x / lhs != rhs)
+          throw RuntimeError("Integer overflow");
+        Push(rhs * lhs);
+        continue;
+      }
+      case Opcode::DIV: {
+            auto rhs = PopInt();
+            auto lhs = PopInt();
+            Push(lhs / rhs);
+            continue;
+      }
       case Opcode::RET: {
         auto depth = prog_.Read<unsigned>(pc_);
         auto nargs = prog_.Read<unsigned>(pc_);
