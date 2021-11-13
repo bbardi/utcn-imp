@@ -50,6 +50,7 @@ public:
     MINUS,
     STAR,
     DIV,
+    DEQUAL,
     // Complex tokens.
     INT,
     STRING,
@@ -119,6 +120,7 @@ public:
   static Token Minus(const Location &l) {return Token(l, Kind::MINUS);}
   static Token Star(const Location &l) {return Token(l, Kind::STAR);}
   static Token Div(const Location &l) {return Token(l, Kind::DIV);}
+  static Token DoubleEqual(const Location &l) {return Token(l, Kind::DEQUAL);}
   /// Print the token to a stream.
   void Print(std::ostream &os) const;
 

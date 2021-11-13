@@ -221,6 +221,9 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
     case BinaryExpr::Kind::DIV: {
         return EmitDiv();
     }
+    case BinaryExpr::Kind::EQUAL: {
+        return EmitEqual();
+    }
   }
 }
 
@@ -383,6 +386,13 @@ void Codegen::EmitDiv()
     Emit<Opcode>(Opcode::DIV);
 }
 
+// -----------------------------------------------------------------------------
+void Codegen::EmitEqual()
+{
+    assert(depth_ > 0 && "no elements on stack");
+    depth_ -= 1;
+    Emit<Opcode>(Opcode::EQUAL);
+}
 
 // -----------------------------------------------------------------------------
 void Codegen::EmitJumpFalse(Label label)

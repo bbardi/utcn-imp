@@ -98,7 +98,8 @@ public:
     ADD,
     MINUS,
     MUL,
-    DIV
+    DIV,
+    EQUAL
   };
 
 public:

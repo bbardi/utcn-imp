@@ -153,8 +153,10 @@ private:
   void EmitSub();
   /// Emit an mul opcode.
   void EmitMul();
-  /// Emit an mul opcode.
+  /// Emit an div opcode.
   void EmitDiv();
+  /// Emit an equal opcode.
+  void EmitEqual();
   /// Emit an push opcode
   void EmitPush(uint64_t number);
   /// Emit a label.
