@@ -22,6 +22,7 @@ public:
     BLOCK,
     WHILE,
     IF,
+    LET,
     EXPR,
     RETURN
   };
@@ -265,6 +266,23 @@ private:
     std::shared_ptr<Stmt> stmt_;
     /// Expression to be executed in the else body.
     std::shared_ptr<Stmt> elsestmt_;
+};
+class LetStmt final : public Stmt {
+public:
+  LetStmt(std::string name,std::string type,std::shared_ptr<Expr> initval)
+  : Stmt(Kind::LET)
+  , initval(initval)
+  , name(name)
+  , type(type){}
+
+  const Expr &GetInitVal() const {return *initval;}
+  const std::string &GetName() const {return name;}
+  const std::string &GetType() const {return type;}
+
+private:
+  std::shared_ptr<Expr> initval;
+  const std::string name;
+  const std::string type;
 };
 
 /**

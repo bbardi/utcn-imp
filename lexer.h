@@ -39,6 +39,7 @@ public:
     WHILE,
     IF,
     ELSE,
+    LET,
     // Symbols.
     LPAREN,
     RPAREN,
@@ -127,6 +128,7 @@ public:
   static Token DoubleEqual(const Location &l) {return Token(l, Kind::DEQUAL);}
   static Token If(const Location &l) { return Token(l, Kind::IF);}
   static Token Else(const Location &l) { return Token(l, Kind::ELSE);}
+  static Token Let(const Location &l) {return Token(l, Kind::LET);}
   /// Print the token to a stream.
   void Print(std::ostream &os) const;
 

@@ -1,0 +1,22 @@
+func print_int(a: int): int = "print_int"
+func read_int(): int = "read_int"
+
+func f(a: int, b: int): int {
+    let c : int = a * b;
+    let d : int = c + c;
+    if (a == 0) {
+        let c : int = c + d;
+        if (b == 1)
+            return a + c;
+        else
+            return d;
+    } else {
+        let c : int = a + b;
+        if (b == 2)
+            return c + 2;
+        else
+            return c;
+    }
+}
+
+print_int(f(read_int(), read_int()))

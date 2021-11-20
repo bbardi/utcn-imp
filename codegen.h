@@ -39,6 +39,7 @@ private:
       FUNC,
       PROTO,
       ARG,
+      VAR,
     } Kind;
 
     union {
@@ -105,6 +106,10 @@ private:
     BlockScope(const Scope *parent) : Scope(parent) {}
 
     Binding Lookup(const std::string &name) const override;
+    void Insert(const std::string& name, uint32_t loc);
+    int NumberOfLocals() const{return vars_.size();};
+  private:
+      std::map<std::string, uint32_t> vars_;
   };
 
 private:
@@ -120,7 +125,8 @@ private:
   void LowerReturnStmt(const Scope &scope, const ReturnStmt &returnStmt);
   /// Lowers a standalone expression statement.
   void LowerExprStmt(const Scope &scope, const ExprStmt &exprStmt);
-
+  /// Lowers a let statement.
+  void LowerLetStmt(const Scope &scope, const LetStmt &letStmt);
   /// Lowers a single expression.
   void LowerExpr(const Scope &scope, const Expr &expr);
   /// Lowers a reference to an identifier.

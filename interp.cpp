@@ -29,7 +29,9 @@ void Interp::Run()
       }
       case Opcode::PEEK: {
         auto idx = prog_.Read<unsigned>(pc_);
-        Push(*(stack_.rbegin() + idx));
+        Interp::Value val(*(stack_.rbegin() + idx));
+        val.Kind = Value::Kind::INT;
+        Push(val);
         continue;
       }
       case Opcode::POP: {

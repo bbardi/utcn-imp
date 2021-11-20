@@ -53,6 +53,12 @@ Codegen::Binding Codegen::FuncScope::Lookup(const std::string &name) const
 // -----------------------------------------------------------------------------
 Codegen::Binding Codegen::BlockScope::Lookup(const std::string &name) const
 {
+    if(auto it = vars_.find(name);it != vars_.end()) {
+        Binding b;
+        b.Kind = Binding::Kind::VAR;
+        b.Index = it->second;
+        return b;
+    }
   // TODO: nothing defined here yet.
   return parent_->Lookup(name);
 }
@@ -123,8 +129,23 @@ void Codegen::LowerStmt(const Scope &scope, const Stmt &stmt)
     case Stmt::Kind::RETURN: {
       return LowerReturnStmt(scope, static_cast<const ReturnStmt &>(stmt));
     }
+    case Stmt::Kind::LET: {
+      return LowerLetStmt(scope, static_cast<const LetStmt &>(stmt));
+    }
   }
 }
+
+void Codegen::BlockScope::Insert(const std::string& name, const uint32_t loc) {
+    vars_[name]=loc;
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::LowerLetStmt(const Scope &scope, const LetStmt &letStmt)
+{
+    LowerExpr(scope,letStmt.GetInitVal());
+    ((BlockScope&) scope).Insert(letStmt.GetName(),depth_);
+}
+
 
 // -----------------------------------------------------------------------------
 void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
@@ -135,7 +156,10 @@ void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
   for (auto &stmt : blockStmt) {
     LowerStmt(blockScope, *stmt);
   }
-
+  int size = blockScope.NumberOfLocals();
+  for(int i = 0;i<size;i++){
+      EmitPop();
+  }
   assert(depth_ == depthIn && "mismatched block depth on exit");
 }
 
@@ -214,6 +238,10 @@ void Codegen::LowerRefExpr(const Scope &scope, const RefExpr &expr)
     }
     case Binding::Kind::ARG: {
       EmitPeek(depth_ + binding.Index + 1);
+      return;
+    }
+    case Binding::Kind::VAR: {
+      EmitPeek(depth_ - binding.Index);
       return;
     }
   }

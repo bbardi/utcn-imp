@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
-
+#include <ostream>
 
 
 /**
@@ -32,6 +32,7 @@ enum class Opcode : uint8_t {
   JUMP_FALSE,
   JUMP,
   STOP
+
 };
 
 
@@ -53,6 +54,8 @@ public:
     pc += sizeof(T);
     return t;
   }
+
+    friend std::ostream &operator<<(std::ostream &os, const Program &program);
 
 private:
   std::vector<uint8_t> code_;

@@ -41,7 +41,8 @@ private:
   std::shared_ptr<WhileStmt> ParseWhileStmt();
   /// Parse an if statement.
   std::shared_ptr<IfStmt> ParseIfStmt();
-
+  std::shared_ptr<LetStmt> ParseLetStmt();
+  
   /// Parse a single expression.
   std::shared_ptr<Expr> ParseExpr() { return ParseBooleanExpr(); }
   /// Parse an expression which has no operators.
