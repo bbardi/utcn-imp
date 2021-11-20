@@ -8,7 +8,6 @@
 #include <vector>
 #include <ostream>
 
-
 /**
  * Enumeration of the opcodes supported by the interpreter.
  */
@@ -34,6 +33,11 @@ enum class Opcode : uint8_t {
   STOP
 
 };
+
+/**
+ * Prints the opcode to a stream, for debugging.
+ */
+std::ostream &operator<<(std::ostream &os, Opcode op);
 
 
 /**
