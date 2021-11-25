@@ -59,7 +59,7 @@ private:
     virtual ~Scope();
 
     virtual Binding Lookup(const std::string &name) const = 0;
-
+    virtual void Insert(const std::string& name, uint32_t loc) const = 0;
   protected:
     const Scope *parent_;
   };
@@ -69,18 +69,24 @@ private:
   public:
     GlobalScope(
         const std::map<std::string, Label> &funcs,
-        const std::map<std::string, RuntimeFn> &protos)
+        const std::map<std::string, RuntimeFn> &protos,
+        std::map<std::string, uint32_t> &vars)
       : Scope(nullptr)
       , funcs_(std::move(funcs))
       , protos_(std::move(protos))
+      , vars_(vars)
     {
     }
 
     Binding Lookup(const std::string &name) const override;
-
+    void Insert(const std::string& name, uint32_t loc) const {
+      vars_[name]=loc;
+    }
+    int NumberOfLocals() const{return vars_.size();};
   private:
     const std::map<std::string, Label> &funcs_;
     const std::map<std::string, RuntimeFn> &protos_;
+    std::map<std::string, uint32_t> &vars_;
   };
 
   /// Scope for the arguments of a function.
@@ -95,7 +101,9 @@ private:
     }
 
     Binding Lookup(const std::string &name) const override;
-
+    void Insert(const std::string& name, uint32_t loc) const {
+      assert(false);
+    }
   private:
     const std::map<std::string, uint32_t> &args_;
   };
@@ -103,13 +111,13 @@ private:
   /// Scope for a block of statements.
   class BlockScope final : public Scope {
   public:
-    BlockScope(const Scope *parent) : Scope(parent) {}
+    BlockScope(const Scope *parent, std::map<std::string,uint32_t> &vars) : Scope(parent),vars_(vars) {}
 
     Binding Lookup(const std::string &name) const override;
-    void Insert(const std::string& name, uint32_t loc);
+    void Insert(const std::string& name, uint32_t loc) const override;
     int NumberOfLocals() const{return vars_.size();};
   private:
-      std::map<std::string, uint32_t> vars_;
+      std::map<std::string, uint32_t> &vars_;
   };
 
 private:

@@ -32,7 +32,12 @@ Codegen::Binding Codegen::GlobalScope::Lookup(const std::string &name) const
     b.Fn = it->second;
     return b;
   }
-
+  if(auto it = vars_.find(name);it != vars_.end()) {
+        Binding b;
+        b.Kind = Binding::Kind::VAR;
+        b.Index = it->second;
+        return b;
+    }
   // The verifier should assert all names are bound.
   assert(!"name not bound");
 }
@@ -90,13 +95,16 @@ std::unique_ptr<Program> Codegen::Translate(const Module &mod)
 
   // Compile all top-level statements in the beginning, to ensure that the
   // instruction at the start of the bytecode stream starts the program.
-  GlobalScope global(funcs_, protos);
+  std::map<std::string, uint32_t> vars;
+  GlobalScope global(funcs_, protos,vars);
   for (auto item : mod) {
     if (!std::holds_alternative<std::shared_ptr<Stmt>>(item)) {
       continue;
     }
     LowerStmt(global, *std::get<2>(item));
   }
+  for (int i =0;i<global.NumberOfLocals();i++)
+    EmitPop();
   Emit<Opcode>(Opcode::STOP);
 
   // Emit code for all functions.
@@ -135,7 +143,7 @@ void Codegen::LowerStmt(const Scope &scope, const Stmt &stmt)
   }
 }
 
-void Codegen::BlockScope::Insert(const std::string& name, const uint32_t loc) {
+void Codegen::BlockScope::Insert(const std::string& name, const uint32_t loc) const {
     vars_[name]=loc;
 }
 
@@ -143,7 +151,7 @@ void Codegen::BlockScope::Insert(const std::string& name, const uint32_t loc) {
 void Codegen::LowerLetStmt(const Scope &scope, const LetStmt &letStmt)
 {
     LowerExpr(scope,letStmt.GetInitVal());
-    ((BlockScope&) scope).Insert(letStmt.GetName(),depth_);
+    scope.Insert(letStmt.GetName(),depth_);
 }
 
 
@@ -151,8 +159,8 @@ void Codegen::LowerLetStmt(const Scope &scope, const LetStmt &letStmt)
 void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
 {
   unsigned depthIn = depth_;
-
-  BlockScope blockScope(&scope);
+  std::map<std::string, uint32_t> vars;
+  BlockScope blockScope(&scope,vars);
   for (auto &stmt : blockStmt) {
     LowerStmt(blockScope, *stmt);
   }

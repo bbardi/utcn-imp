@@ -1,4 +1,3 @@
-
 func print_int(a: int): int = "print_int"
 func read_int(): int = "read_int"
 
@@ -18,4 +17,6 @@ func exp(a: int, n: int): int {
   }
 }
 
-print_int(exp(read_int(), read_int()))
+let a:int = read_int()
+let n:int = read_int()
+print_int(exp(a, n))
