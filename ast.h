@@ -102,7 +102,8 @@ public:
     MUL,
     DIV,
     MOD,
-    EQUAL
+    EQUAL,
+    ASSIGN
   };
 
 public:

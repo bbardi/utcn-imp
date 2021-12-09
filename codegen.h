@@ -183,7 +183,8 @@ private:
   void EmitJumpFalse(Label label);
   /// Emit an unconditional jump.
   void EmitJump(Label label);
-
+  /// Emit an poke
+  void EmitPoke(uint32_t offset);
   /// Emit some bytes of code.
   template<typename T>
   void Emit(const T &t);

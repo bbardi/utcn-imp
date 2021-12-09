@@ -11,6 +11,7 @@ func f(a: int, b: int): int {
         else
             return d;
     } else {
+        a = 0;
         let c : int = a + b;
         if (b == 2)
             return c + 2;

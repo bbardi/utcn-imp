@@ -258,6 +258,25 @@ void Codegen::LowerRefExpr(const Scope &scope, const RefExpr &expr)
 // -----------------------------------------------------------------------------
 void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
 {
+  if(binary.GetKind() == BinaryExpr::Kind::ASSIGN)
+  {
+      assert(binary.GetLHS().GetKind() == Expr::Kind::REF && "You can assign only to references");
+      LowerExpr(scope, binary.GetRHS());
+      auto binding = scope.Lookup(static_cast<const RefExpr &>(binary.GetLHS()).GetName());
+      switch(binding.Kind){
+              case Binding::Kind::ARG: {
+                  EmitPoke(depth_ + binding.Index + 1);
+                  return;
+              }
+              case Binding::Kind::VAR: {
+                  EmitPoke(depth_ - binding.Index);
+                  return;
+              }
+              default:
+                  assert(false && "You can assign to variables only");
+                  return;
+      }
+  }
   LowerExpr(scope, binary.GetLHS());
   LowerExpr(scope, binary.GetRHS());
   switch (binary.GetKind()) {
@@ -472,3 +491,13 @@ void Codegen::EmitJump(Label label)
   Emit<Opcode>(Opcode::JUMP);
   EmitFixup(label);
 }
+
+// -----------------------------------------------------------------------------
+void Codegen::EmitPoke(uint32_t offset)
+{
+    //assert(depth_ > 0 && "no elements on stack");
+    //depth_ -= 1;
+    Emit<Opcode>(Opcode::POKE);
+    Emit<int64_t>(offset);
+}
+

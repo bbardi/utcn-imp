@@ -280,6 +280,18 @@ std::shared_ptr<Expr> Parser::ParseBooleanExpr()
 }
 
 // -----------------------------------------------------------------------------
+std::shared_ptr<Expr> Parser::ParseAssignExpr()
+{
+    std::shared_ptr<Expr> term = ParseBooleanExpr();
+    if (Current().Is(Token::Kind::EQUAL)) {
+        lexer_.Next();
+        auto rhs = ParseBooleanExpr();
+        term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::ASSIGN, term, rhs);
+    }
+    return term;
+}
+
+// -----------------------------------------------------------------------------
 const Token &Parser::Expect(Token::Kind kind)
 {
   lexer_.Next();

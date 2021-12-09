@@ -24,6 +24,7 @@ std::ostream &operator<<(std::ostream &os, Opcode op)
     case Opcode::MUL:        return os << "MUL";
     case Opcode::MOD:        return os << "MOD";
     case Opcode::EQUAL:      return os << "EQU";
+    case Opcode::POKE:       return os << "POKE";
   }
   assert(!"invalid opcode");
 }

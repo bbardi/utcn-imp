@@ -12,6 +12,7 @@ void Interp::Run()
 {
   for (;;) {
     auto op = prog_.Read<Opcode>(pc_);
+    //std::cout << op<<"\n";
     switch (op) {
       case Opcode::PUSH_FUNC: {
         Push(prog_.Read<size_t>(pc_));
@@ -33,6 +34,13 @@ void Interp::Run()
         val.Kind = Value::Kind::INT;
         Push(val);
         continue;
+      }
+      case Opcode::POKE: {
+          auto idx = prog_.Read<uint64_t>(pc_);
+          auto val = Pop();
+          *(stack_.rbegin()+idx) = val;
+          Push(val);
+          continue;
       }
       case Opcode::POP: {
         Pop();
