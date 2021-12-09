@@ -265,11 +265,11 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
       auto binding = scope.Lookup(static_cast<const RefExpr &>(binary.GetLHS()).GetName());
       switch(binding.Kind){
               case Binding::Kind::ARG: {
-                  EmitPoke(depth_ + binding.Index + 1);
+                  EmitPoke(depth_ + binding.Index);
                   return;
               }
               case Binding::Kind::VAR: {
-                  EmitPoke(depth_ - binding.Index);
+                  EmitPoke((depth_ - binding.Index)-1);
                   return;
               }
               default:
